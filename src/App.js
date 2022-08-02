@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 const App = () => {
     //state
     const [pokemon, setPokemon] = useState(null)
+    const [randomId, setRandomId] = useState(1)
 
     //componentDidMount
     // useEffect(() => {}, [])
@@ -10,34 +11,48 @@ const App = () => {
     //componentDidUpdate
     useEffect(() => {
         fetchData()
-    }, [pokemon])
+        // eslint-disable-next-line
+    }, [randomId])
 
     //methodes
     const fetchData = async () => {
-        const request = await fetch("https://pokeapi.co/api/v2/pokemon/893")
+        const request = await fetch(
+            `https://pokeapi.co/api/v2/pokemon/${randomId}`
+        )
         const response = await request.json()
         setPokemon(response)
     }
-    // console.log(pokemon.sprites)
+    const generateRandomId = () => {
+        const random = Math.floor(Math.random() * 151) + 1
+        setRandomId(random)
+    }
     //render
-    if (!pokemon) {
-        return <div>chargement</div>
-        //benoit WTF !!!!
+    if (pokemon === null) {
+        return (
+            <div>
+                <p>Loading..</p>
+                <button onClick={generateRandomId}>
+                    Show a random Pokemon
+                </button>
+            </div>
+        )
     }
     return (
         <main>
-            <img src={pokemon.sprites.front_shiny} /> <br />
-            <span>{pokemon.name}</span> <br />
-            <span>{pokemon.height} kg</span> <br />
-            <span>{pokemon.weight} cm</span> <br />
-            {pokemon.types.map((type) => {
-                return (
-                    <>
-                        <span>{type.type.name}</span>
-                        <br />
-                    </>
-                )
-            })}
+            <img src={pokemon.sprites.front_shiny} alt="pokemon" />
+            <h1>{pokemon.name}</h1>
+            <p>{pokemon.height} kg</p>
+            <p>{pokemon.weight} cm</p>
+            <ul>
+                {pokemon.types.map((type) => {
+                    return (
+                        <>
+                            <li key={pokemon.forms}>{type.type.name}</li>
+                        </>
+                    )
+                })}
+            </ul>
+            <button onClick={generateRandomId}>Show a random Pokemon</button>
         </main>
     )
 }
